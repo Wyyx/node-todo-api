@@ -16,15 +16,14 @@ const app = experss()
 app.use(bodyParser.json())
 
 app.post('/todos', (req, res) => {
-    console.log(req.body.text)
-    let todo = new Todo({
+    let newTodo = new Todo({
         text: req.body.text
     })
 
-    todo.save()
-        .then((doc) => {
-            console.log(doc)
-            res.send(doc)
+    newTodo.save()
+        .then((todo) => {
+            console.log(todo)
+            res.send(todo)
         }, (err) => {
             res.status(400).send(err)
             console.log(err)
@@ -33,6 +32,22 @@ app.post('/todos', (req, res) => {
     console.log(err)
 })
 
+app.get('/todos', (req, res) => {
+    Todo.find()
+        .then((todos) => {
+            res.send({
+                todos
+            })
+
+        }, (err) => {
+            res.status(400).send(err)
+        })
+})
+
 app.listen(3000, () => {
     console.log('Started on port 3000')
 })
+
+module.exports = {
+    app
+}
