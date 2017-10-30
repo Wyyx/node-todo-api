@@ -8,6 +8,9 @@
     "dev": "nodemon server/server.js",
     "test-watch": "nodemon --exec \"npm test\""
   },
+  "engines": {
+    "node": "6.11.3"
+  },
   "author": "",
   "license": "ISC",
   "dependencies": {
