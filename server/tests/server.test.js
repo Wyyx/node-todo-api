@@ -17,7 +17,9 @@ const todos = [{
     text: 'First test todo'
 }, {
     _id: new ObjectId(),
-    text: 'Second test todo'
+    text: 'Second test todo',
+    completed: true,
+    completedAt: 333
 }]
 
 beforeEach((done) => {
@@ -158,11 +160,32 @@ describe('DELETE /todos/:id', () => {
 
     it('should return 404 if not find', (done) => {
         let url = `/todos/${todos[0]._id.toHexString()}`
-        url = url.substr(0, url.length - 1) + '0'
+        url = url.substr(0, url.length - 1) + '1'
         console.log(url)
         request(app)
             .delete(url)
             .expect(404)
+            .end(done)
+    })
+})
+
+describe('PATCH /todos/:id', () => {
+    it('should update the todo', (done) => {
+        let id = todos[0]._id.toHexString()
+        let text = 'This should be the new text'
+
+        request(app)
+            .patch(`/todos/${id}`)
+            .send({
+                completed: true,
+                text
+            })
+            .expect(200)
+            .expect((res) => {
+                expect(res.body.todo.text).toBe(text)
+                expect(res.body.todo.completed).toBe(true)
+                expect(res.body.todo.completedAt).toBeA('number')
+            })
             .end(done)
     })
 })
