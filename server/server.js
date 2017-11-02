@@ -1,5 +1,4 @@
 require('./config/config')
-
 const {
     ObjectId
 } = require('mongodb')
@@ -16,6 +15,9 @@ const {
 const {
     Todo
 } = require('./models/todo')
+const {
+    authenticate
+} = require('./middlewares/authenticate')
 
 
 const app = experss()
@@ -71,7 +73,7 @@ app.get('/todos/:id', (req, res) => {
                 todo
             })
         })
-        .catch((err) => {
+        .catch((e) => {
             res.status(404).send()
         })
 })
@@ -93,7 +95,7 @@ app.delete('/todos/:id', (req, res) => {
                 todo
             })
         })
-        .catch((err) => {
+        .catch((e) => {
             res.status(404).send()
         })
 
@@ -130,9 +132,9 @@ app.patch('/todos/:id', (req, res) => {
                 todo
             })
         })
-        .catch((err) => {
+        .catch((e) => {
             res.status(400).send()
-            console.log(err)
+            console.log(e)
         })
 
 })
@@ -141,15 +143,19 @@ app.patch('/todos/:id', (req, res) => {
 app.post('/users', (req, res) => {
     let body = _.pick(req.body, ['email', 'password'])
     let user = new User(body)
-    let token = user.generateAuthToken()
 
-    user.save()
-        .then(() => {
+    user.generateAuthToken()
+        .then((token) => {
             res.header('x-auth', token).send(user)
         })
-        .catch((err) => {
-            res.status(400).send(err)
+        .catch((e) => {
+            res.status(400).send(e)
         })
+})
+
+
+app.get('/users/me', authenticate, (req, res) => {
+    res.status(200).send(req.user)
 })
 
 app.listen(port, () => {

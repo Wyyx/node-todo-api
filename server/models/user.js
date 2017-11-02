@@ -3,7 +3,7 @@ const mongoose = require('mongoose')
 const jwt = require('jsonwebtoken')
 const _ = require('lodash')
 
-let userSchema = new mongoose.Schema({
+let UserSchema = new mongoose.Schema({
     email: {
         type: String,
         require: true,
@@ -32,13 +32,13 @@ let userSchema = new mongoose.Schema({
     }]
 })
 
-userSchema.methods.toJSON = function () {
+UserSchema.methods.toJSON = function () {
     let user = this
     let userObject = user.toObject()
     return _.pick(userObject, ['email', '_id'])
 }
 
-userSchema.methods.generateAuthToken = function () {
+UserSchema.methods.generateAuthToken = function () {
     let user = this
     let access = 'auth'
     let token = jwt.sign({
@@ -51,11 +51,34 @@ userSchema.methods.generateAuthToken = function () {
         token
     })
 
-    return token
+    return user.save()
+        .then(() => {
+            return token
+        })
+        .catch((e) => {
+            console.log(e)
+        })
+}
+
+UserSchema.statics.findByToken = function (token) {
+    let User = this
+    let decoded;
+
+    try {
+        decoded = jwt.verify(token, 'abc123')
+    } catch (e) {
+        return Promise.reject(e)
+    }
+
+    return User.findOne({
+        _id: decoded._id,
+        'tokens.access': 'auth',
+        'tokens.token': token
+    })
 }
 
 
-let User = mongoose.model('User', userSchema)
+let User = mongoose.model('User', UserSchema)
 
 module.exports = {
     User
