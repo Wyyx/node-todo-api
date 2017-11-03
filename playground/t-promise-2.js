@@ -4,7 +4,6 @@ let p1 = new Promise(function (resolve, reject) {
     // reject("Error!");
 });
 
-
 p1.then(function (value) {
         console.log(value); // Success!
     }, function (reason) {
@@ -14,21 +13,21 @@ p1.then(function (value) {
     })
     .then(() => {
         console.log('bbb')
-        return Promise.reject('There are some errors!')
-        // return Promise.resolve('It is success!')
+
+        return new Promise((resolve, reject) => {
+            setTimeout(function () {
+                console.log('setTimeout')
+            }, 2000);
+            console.log('xxx')
+            resolve()
+        })
+
     })
     .then(() => {
-        console.log('ccc: success version')
-    }, () => {
-        console.log('ccc: reject version')
-    })
-    .then(() => {
-        console.log('ddd')
-    }, () => {
-        console.log('ddd: reject version')
+        console.log('ccc')
     })
     .catch((err) => {
         console.log(err)
     })
 
-console.log('hhh!')
+console.log('111')
