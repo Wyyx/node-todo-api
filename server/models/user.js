@@ -7,7 +7,7 @@ const bcrypt = require('bcryptjs')
 let UserSchema = new mongoose.Schema({
     email: {
         type: String,
-        require: true,
+        required: true,
         trim: true,
         minlength: 1,
         unique: true,
@@ -55,6 +55,8 @@ UserSchema.methods.generateAuthToken = function () {
     return user.save()
         .then(() => {
             return token
+        }, (err) => {
+            return null
         })
         .catch((e) => {
             console.log(e)
@@ -80,11 +82,10 @@ UserSchema.statics.findByToken = function (token) {
 
 UserSchema.pre('save', function (next) {
     let user = this
-
     if (user.isModified('password')) {
         bcrypt.genSalt(10, (err, salt) => {
             bcrypt.hash(user.password, salt, (err, hash) => {
-                console.log(hash)
+                // console.log(hash)
                 user.password = hash
                 next()
             })

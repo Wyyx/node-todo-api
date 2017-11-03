@@ -29,14 +29,14 @@ app.post('/todos', (req, res) => {
     let newTodo = new Todo({
         text: req.body.text
     })
-
     newTodo.save()
         .then((todo) => {
-            console.log(todo)
-            res.send(todo)
+            res.status(200).send(todo)
         }, (err) => {
             res.status(400).send(err)
-            console.log(err)
+        })
+        .catch((e) => {
+            res.status(400).send(err)
         })
 }, (err) => {
     console.log(err)
@@ -146,7 +146,11 @@ app.post('/users', (req, res) => {
 
     user.generateAuthToken()
         .then((token) => {
-            res.header('x-auth', token).send(user)
+            if (!token) {
+                return res.status(400).send()
+            }
+
+            res.header('x-auth', token).status(200).send(user)
         })
         .catch((e) => {
             res.status(400).send(e)

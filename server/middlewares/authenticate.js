@@ -15,7 +15,7 @@ const authenticate = function (req, res, next) {
             req.token = token
             next()
         }, (err) => {
-            console.log(err)
+            // console.log(err)
             res.status(401).send()
         })
         .catch((e) => {
